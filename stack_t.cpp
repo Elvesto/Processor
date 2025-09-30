@@ -1,8 +1,9 @@
 #include "stack_t.h"
 
 #include <malloc.h>
+#include <stdlib.h>
 
-#include "settings.h"
+#include "log.h"
 
 StackError stackInit(Stack_t* stack, long long capacity) {
     if (stack == NULL) {
@@ -13,21 +14,19 @@ StackError stackInit(Stack_t* stack, long long capacity) {
         return SIZE_ERROR;
     }
 
-    free(stack->data);
-
     stack->data = (TypeElement*)calloc((size_t)capacity + 2, sizeof(TypeElement));
     if (stack->data == NULL) {
         return PTR_ERROR;
     }
     
-    stack->capacity = capacity + 1;
+    stack->capacity = capacity + 2;
     stack->size = 1;
 
-    //KANAREYKA
+    //CANAREYKA
     stack->data[0] = LEFT_KANAR;
-    stack->data[stack->capacity] = RIGHT_KANAR;
+    stack->data[stack->capacity - 1] = RIGHT_KANAR;
 
-    for (int i = stack->size; i < stack->capacity; i++) {
+    for (long long i = stack->size; i < stack->capacity - 1; i++) {
         stack->data[i] = POIZON;
     }
 
@@ -36,8 +35,9 @@ StackError stackInit(Stack_t* stack, long long capacity) {
 
 StackError stackPush(Stack_t* stack, TypeElement value) {
     stackVerify(stack);
+    //STACK_DUMP(stack, OK);
 
-    long long index = stack->size + 1;
+    long long index = stack->size;
     if (index == stack->capacity - 1) {
         stackUp(stack);
     }
@@ -47,6 +47,7 @@ StackError stackPush(Stack_t* stack, TypeElement value) {
         return SIZE_ERROR;
     }
     stack->data[stack->size++] = value;
+    //STACK_DUMP(stack, OK);
 
     stackVerify(stack);
     
@@ -57,6 +58,7 @@ TypeElement stackPop(Stack_t* stack, StackError* error) {
     if (stackVerify(stack) != OK && error != NULL) {
         *error = stackVerify(stack);
     }
+    //STACK_DUMP(stack, OK);
     
     TypeElement temp = {};
     long long index = stack->size - 1;
@@ -67,6 +69,12 @@ TypeElement stackPop(Stack_t* stack, StackError* error) {
     temp = stack->data[index];
     stack->data[index] = 0xeda;
     stack->size--;
+
+    if (stack->size < stack->capacity / 4) {
+        stackDown(stack);
+    }
+
+    //STACK_DUMP(stack, OK);
 
     if (stackVerify(stack) != OK && error != NULL)
         *error = stackVerify(stack);
@@ -135,15 +143,15 @@ void stackDump(Stack_t* stack, const char* file, const char* func, size_t line, 
         "size: %ld \n"
         "capacity: %ld\n", stack->data, stack->size, stack->capacity
     );
-    logWrite(INFO, "![0] = %d - LEFT CANAR\n", stack->data[0]);
+    logWrite(INFO, "!!![0]!!! = %d - LEFT CANAR (expected %d)\n", stack->data[0], LEFT_KANAR);
     for (long long i = 1; i < stack->size; i++) {
         logWrite(INFO, "*[%ld] = %d\n", i, stack->data[i]);
     }
 
-    for (long long i = stack->size; i < stack->capacity; i++) {
-        logWrite(INFO, "*[%ld] = (POIZON)\n", i);
+    for (long long i = stack->size; i < stack->capacity - 1; i++) {
+        logWrite(INFO, "*[%ld] = %d (POIZON)\n", i, stack->data[i]);
     }
-    logWrite(INFO, "![%ld] = %d - RIGHT CANAR\n", stack->capacity, stack->data[stack->capacity - 1]);
+    logWrite(INFO, "!!![%ld]!!! = %d - RIGHT CANAR (expected %d)\n\n\n", stack->capacity - 1, stack->data[stack->capacity - 1], RIGHT_KANAR);
 
 }
 
@@ -160,15 +168,40 @@ const char* errorToString(StackError error) {
 StackError stackUp(Stack_t* stack) {
     stackVerify(stack);
 
-    TypeElement* temp = (TypeElement*)realloc(stack->data, stack->capacity * 2 * sizeof(TypeElement));
+    //STACK_DUMP(stack, OK);
+
+    TypeElement* temp = (TypeElement*)realloc(stack->data, stack->capacity * RESIZE * sizeof(TypeElement));
     if (temp == NULL) {
         stackDestroy(stack);
-        return PTR_ERROR;
+        exit(PTR_ERROR);
     }
     stack->data = temp;
-    stack->capacity = stack->capacity * 2;
+    stack->capacity *= RESIZE;
     stack->data[stack->capacity- 1] = RIGHT_KANAR;
+
+    for (long long i = stack->size; i < stack->capacity - 1; i++) {
+        stack->data[i] = POIZON;
+    }
+
+    //STACK_DUMP(stack, OK);
 
     return stackVerify(stack);
 }
 
+StackError stackDown(Stack_t* stack) {
+    stackVerify(stack);
+    TypeElement* temp = (TypeElement*)realloc(stack->data, (stack->capacity / RESIZE) * sizeof(TypeElement));
+    if (temp == NULL) {
+        stackDestroy(stack);
+        exit(PTR_ERROR);
+    }
+    stack->data = temp;
+    stack->capacity /= RESIZE;
+    stack->data[stack->capacity - 1] = RIGHT_KANAR;
+
+    for (long long i = stack->size; i < stack->capacity - 1; i++) {
+        stack->data[i] = POIZON;
+    }
+
+    return stackVerify(stack);
+}

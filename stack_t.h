@@ -10,7 +10,9 @@ typedef int TypeElement;
 const TypeElement LEFT_KANAR = 0b00101011101000101011100100011100;
 const TypeElement RIGHT_KANAR = 0b01010100010111010100011011100011;
 
-const TypeElement POIZON = 0b10001000111001001111001111;
+const TypeElement POIZON = 0xEDA;
+
+const int RESIZE = 2;
 
 typedef struct {
     TypeElement* data;
@@ -40,6 +42,8 @@ void stackDump(Stack_t* stack, const char* file, const char* func, size_t line, 
 const char* errorToString(StackError error);
 
 StackError stackUp(Stack_t* stack);
+
+StackError stackDown(Stack_t* stack);
 
 
 #endif // STACK_H_
