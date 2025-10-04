@@ -1,0 +1,174 @@
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 3 
+capacity: 32
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 10
+INFO	*[2] = 10
+INFO	  *[3]   = 3802 (POIZON)
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	  *[7]   = 3802 (POIZON)
+INFO	  *[8]   = 3802 (POIZON)
+INFO	  *[9]   = 3802 (POIZON)
+INFO	  *[10]   = 3802 (POIZON)
+INFO	  *[11]   = 3802 (POIZON)
+INFO	  *[12]   = 3802 (POIZON)
+INFO	  *[13]   = 3802 (POIZON)
+INFO	  *[14]   = 3802 (POIZON)
+INFO	  *[15]   = 3802 (POIZON)
+INFO	  *[16]   = 3802 (POIZON)
+INFO	  *[17]   = 3802 (POIZON)
+INFO	  *[18]   = 3802 (POIZON)
+INFO	  *[19]   = 3802 (POIZON)
+INFO	  *[20]   = 3802 (POIZON)
+INFO	  *[21]   = 3802 (POIZON)
+INFO	  *[22]   = 3802 (POIZON)
+INFO	  *[23]   = 3802 (POIZON)
+INFO	  *[24]   = 3802 (POIZON)
+INFO	  *[25]   = 3802 (POIZON)
+INFO	  *[26]   = 3802 (POIZON)
+INFO	  *[27]   = 3802 (POIZON)
+INFO	  *[28]   = 3802 (POIZON)
+INFO	  *[29]   = 3802 (POIZON)
+INFO	  *[30]   = 3802 (POIZON)
+INFO	!!![31]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[20] 
+size: 2 
+capacity: 16
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 10
+INFO	  *[2]   = 3802 (POIZON)
+INFO	  *[3]   = 3802 (POIZON)
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	  *[7]   = 3802 (POIZON)
+INFO	  *[8]   = 3802 (POIZON)
+INFO	  *[9]   = 3802 (POIZON)
+INFO	  *[10]   = 3802 (POIZON)
+INFO	  *[11]   = 3802 (POIZON)
+INFO	  *[12]   = 3802 (POIZON)
+INFO	  *[13]   = 3802 (POIZON)
+INFO	  *[14]   = 3802 (POIZON)
+INFO	!!![15]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 5 
+capacity: 8
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 100
+INFO	*[2] = 4
+INFO	*[3] = 20
+INFO	*[4] = -100
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 4 
+capacity: 8
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 100
+INFO	*[2] = 4
+INFO	*[3] = 20
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 4 
+capacity: 8
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 100
+INFO	*[2] = 4
+INFO	*[3] = -2000
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 3 
+capacity: 8
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 100
+INFO	*[2] = 4
+INFO	  *[3]   = 3802 (POIZON)
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 3 
+capacity: 8
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 100
+INFO	*[2] = -8000
+INFO	  *[3]   = 3802 (POIZON)
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[40] 
+size: 2 
+capacity: 8
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 100
+INFO	  *[2]   = 3802 (POIZON)
+INFO	  *[3]   = 3802 (POIZON)
+INFO	  *[4]   = 3802 (POIZON)
+INFO	  *[5]   = 3802 (POIZON)
+INFO	  *[6]   = 3802 (POIZON)
+INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[10] 
+size: 2 
+capacity: 4
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 8100
+INFO	  *[2]   = 3802 (POIZON)
+INFO	!!![3]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
+DEBUG	stack[cdedaff0]
+in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+INFO	data[10] 
+size: 2 
+capacity: 4
+INFO	!!![0]!!! = 732084508 - LEFT CANAR (expected 732084508)
+INFO	*[1] = 90
+INFO	  *[2]   = 3802 (POIZON)
+INFO	!!![3]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
+
+
