@@ -10,6 +10,8 @@ typedef struct {
 //TODO 
 int arrayCtor(Array* arr);
 
+int arrayRealloc(Array* arr);
+
 int arrayDtor(Array* arr);
 
 #endif // ARRAY_H_

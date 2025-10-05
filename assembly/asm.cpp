@@ -4,32 +4,57 @@
 #include <string.h>
 #include <assert.h>
 #include <malloc.h>
+#include <stdlib.h>
+#include <limits.h>
 
 #include "../array/array.h"
 #include "colors.h"
+#include "../processor/processor.h"
 
 int parser(File* in, Array* arr) {
     assert(in);
     assert(arr);
     assert(arr->data);
     if (arr->capacity == arr->size) {
-        int* temp = (int*)realloc(arr->data, arr->capacity * 2);
-        if (!temp) {
-            return 1;
-        }
-        arr->data = temp;
-        assert(arr->data);
+        arrayRealloc(arr);
     }
     char command[10] = {};
     static unsigned int line = 1;
 
-    fscanf(in->file, "%9s", command);
+    fscanf(in->file, "%9s ;", command);
 
     if ((strcmp(command, "PUSH") == 0) || (strcmp(command, "TOLKAI") == 0)) {
-        int temp = 0;
-        fscanf(in->file, "%d", &temp);
-        arr->data[(arr->size)++] = PUSH;
-        arr->data[(arr->size)++] = temp;
+        long long temp = 0;
+        char str[32] = {};
+        char* ptr;
+        Registers reg = {};
+
+        fscanf(in->file, "%31s ;", str);
+
+        temp = strtol(str, &ptr, 10);
+        if (ptr != str && temp != LONG_MAX && temp != LONG_MIN) {
+            arr->data[(arr->size)++] = PUSH;
+            arr->data[(arr->size)++] = (int)temp;
+        } else if (ptr == str) {
+            if (strcmp(str, "RAX") == 0) {
+                reg = RAX;
+            } else if (strcmp(str, "RBX") == 0) {
+                reg = RBX;
+            } else if (strcmp(str, "RCX") == 0) {
+                reg = RCX;
+            } else if (strcmp(str, "RDX") == 0) {
+                reg = RDX;
+            } else if (strcmp(str, "REX") == 0) {
+                reg = REX;
+            } else if (strcmp(str, "RFX") == 0) {
+                reg = RFX;
+            } else if (strcmp(str, "RGX") == 0) {
+                reg = RGX;
+            }
+            arr->data[(arr->size)++] = PUSHR;
+            arr->data[(arr->size)++] = reg;
+        }
+        
     } else if ((strcmp(command, "ADD") == 0) || (strcmp(command, "DOBAV") == 0)) {
         arr->data[(arr->size)++] = ADD;
     } else if ((strcmp(command, "SUB") == 0) || (strcmp(command, "HUAR") == 0)) {
@@ -45,8 +70,9 @@ int parser(File* in, Array* arr) {
         arr->data[(arr->size)++] = DIV;
     } else if ((strcmp(command, "SQRT") == 0) || (strcmp(command, "SQVRT") == 0)) {
         arr->data[(arr->size)++] = SQRT;
-    } else if (strchr(command, ';')) {
-        *(strchr(command, ';')) = '\0';
+    // } else if (strchr(command, ';')) {
+    //     *(strchr(command, ';')) = '\0';
+    // } 
     } else {
         printf(RED BOLD"Unknown phrase in %s:%u\n" RESET, in->name, line);
         return 1;

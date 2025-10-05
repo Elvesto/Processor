@@ -13,7 +13,7 @@ int main(int argv, char* argc[]) {
     in.file = fopen(in.name, "r");
     out.file = fopen(out.name, "wb");
     dis.file = fopen(dis.name, "w");
-    if (in.file == NULL || out.file == NULL) {
+    if (in.file == NULL || out.file == NULL || dis.file == NULL) {
         printf("FILE NO OPEN\n");
         return 1;
     }
