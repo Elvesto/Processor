@@ -1,5 +1,5 @@
-#ifndef ASM_H_
-#define ASM_H_
+#ifndef DISASM_H_
+#define DISASM_H_
 
 #include <stdio.h>
 
@@ -24,6 +24,7 @@ typedef struct {
     FILE* file;
 } File;
 
-int parser(File* in, Array* arr);
 
-#endif //ASM_H_
+int disasm(File* out, Array* arr);
+
+#endif // DISASM_H_

@@ -1,5 +1,5 @@
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 3 
 capacity: 32
@@ -37,8 +37,8 @@ INFO	  *[30]   = 3802 (POIZON)
 INFO	!!![31]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[20] 
 size: 2 
 capacity: 16
@@ -60,8 +60,8 @@ INFO	  *[14]   = 3802 (POIZON)
 INFO	!!![15]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 5 
 capacity: 8
@@ -75,8 +75,8 @@ INFO	  *[6]   = 3802 (POIZON)
 INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 4 
 capacity: 8
@@ -90,8 +90,8 @@ INFO	  *[6]   = 3802 (POIZON)
 INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 4 
 capacity: 8
@@ -105,8 +105,8 @@ INFO	  *[6]   = 3802 (POIZON)
 INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 3 
 capacity: 8
@@ -120,8 +120,8 @@ INFO	  *[6]   = 3802 (POIZON)
 INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 3 
 capacity: 8
@@ -135,8 +135,8 @@ INFO	  *[6]   = 3802 (POIZON)
 INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[40] 
 size: 2 
 capacity: 8
@@ -150,8 +150,8 @@ INFO	  *[6]   = 3802 (POIZON)
 INFO	!!![7]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[10] 
 size: 2 
 capacity: 4
@@ -161,8 +161,8 @@ INFO	  *[2]   = 3802 (POIZON)
 INFO	!!![3]!!! = 1415399139 - RIGHT CANAR (expected 1415399139)
 
 
-DEBUG	stack[cdedaff0]
-in stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
+DEBUG	stack[f4c39780]
+in ../stack/stack_t.cpp:58 	 in stackPop 	 exception: NO PROBLEMS
 INFO	data[10] 
 size: 2 
 capacity: 4
