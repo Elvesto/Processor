@@ -4,6 +4,7 @@
 #include "../stack/stack_t.h"
 #include "../array/array.h"
 
+
 enum Registers {
     RESERVED = 0,
     RAX = 1,
@@ -18,8 +19,29 @@ enum Registers {
 typedef struct {
     Stack stack;
     Array instructions;
-    size_t ip;
+    int64_t ip;
     int regs[8];
+    Stack returnAddress;
 } Processor;
 
-#endif // PROCESSOR
+enum ProcessorErrors {
+    NO_PROBLEMS = 0,
+    STACK_ERROR = 1,
+    INIT_ERROR = 2,
+    DESTROY_ERROR = 3,
+    FILE_ERROR = 4,
+    STRANGE = 5,
+    NULL_POINTER = 6,
+
+    //  . .
+};
+
+ProcessorErrors procInit(Processor* proc);
+
+ProcessorErrors procDestroy(Processor* proc);
+
+//TODO
+
+
+
+#endif // PROCESSOR_H_

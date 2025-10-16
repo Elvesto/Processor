@@ -1,6 +1,7 @@
 #include "disAsm.h"
 
 #include "../array/array.h"
+#include "../processor/processor.h"
 
 int disasm(File* out, Array* arr) {
     for (int i = 0; ; i++) {
@@ -45,6 +46,15 @@ int disasm(File* out, Array* arr) {
                 fprintf(out->file, "HLT\n");
                 return 1;
             }
+            case PUSHR:
+            {
+                fprintf(out->file, "PUSH %s\n", regToStr((Registers)arr->data[++i]));
+                break;
+            }
+            case POPR: {
+                fprintf(out->file, "POPR %s\n", regToStr((Registers)arr->data[++i]));
+                break;
+            }
             default:
             {
                 printf("DATA: %d\t%d\n", arr->data[i], i);
@@ -53,4 +63,18 @@ int disasm(File* out, Array* arr) {
         }
     }
     return 0;
+}
+
+const char* regToStr(Registers reg) {
+    switch (reg) {
+        case RESERVED: return "RESERVED";
+        case RAX: return "RAX";
+        case RBX: return "RBX";
+        case RCX: return "RCX";
+        case RDX: return "RDX";
+        case REX: return "REX";
+        case RFX: return "RFX";
+        case RGX: return "RGX";
+        default: return "razrab daun";
+    }
 }
