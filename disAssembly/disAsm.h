@@ -27,4 +27,6 @@ typedef struct {
 
 int disasm(File* out, Array* arr);
 
+const char* regToStr(Registers reg);
+
 #endif // DISASM_H_

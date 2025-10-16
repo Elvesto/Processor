@@ -17,10 +17,7 @@ int main(int argv, char* argc[]) {
     }
 
     Array array = {};
-    array.capacity = 128;
-    array.data = (int*)calloc(array.capacity, sizeof(int));
-
-    
+    arrayInit(&array, 128);
     
     while(!parser(&in, &array));
 

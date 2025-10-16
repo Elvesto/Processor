@@ -11,26 +11,32 @@ int main() {
     openLog("../files/dumps.txt");
     
     Processor processor = {};
-    StackError err = OK;
+    ProcessorErrors err = NO_PROBLEMS;
 
-    err = stackInit(&processor.stack, 30);
+    // err = stackInit(&processor.stack, 30);
+    // if (err) {
+    //     perror("TEXT_CREATE_ERROR");
+    //     return err;
+    // }
+
+    // processor.instructions.capacity = 128;
+    // processor.instructions.data = (int*)calloc(processor.instructions.capacity, sizeof(int));
+    // if (processor.instructions.data == NULL) {
+    //     printf("No memory allocotaion\n");
+    //     return PTR_ERROR;
+    // }
+
+    err = procInit(&processor);
     if (err) {
-        perror("TEXT_CREATE_ERROR");
+        printf("Processor not initialisated\n");
         return err;
-    }
-
-    processor.instructions.capacity = 128;
-    processor.instructions.data = (int*)calloc(processor.instructions.capacity, sizeof(int));
-    if (processor.instructions.data == NULL) {
-        printf("No memory allocotaion\n");
-        return PTR_ERROR;
     }
 
     FILE* byteCode = fopen("../files/byteCode.bin", "rb");
     if (fread(processor.instructions.data, sizeof(int), processor.instructions.capacity - 1, byteCode) != 128) {
         if (feof(byteCode) == 0) {
             printf("File no open\n");
-            return PTR_ERROR;
+            return FILE_ERROR;
         }
     }
 
@@ -39,20 +45,16 @@ int main() {
 
     err = executor(&processor);
     if (err) {
-        perror(errorToString(err));
         return err;
     }
 
-    err = stackDestroy(&processor.stack);
+    err = procDestroy(&processor);
     if (err) {
-        perror(errorToString(err));
-        return PTR_ERROR;
+        return err;
     }
         
 
     fclose(byteCode);
-    
-    free(processor.instructions.data);
     
     closeLog();
 }
