@@ -17,12 +17,16 @@ int main(int argv, char* argc[]) {
     }
 
     Array array = {};
-    array.capacity = 128;
-    array.data = (int*)calloc(array.capacity, sizeof(int));
+    arrayInit(&array, 128);
+    
+    char* buf = {};
 
-    
-    
-    while(!parser(&in, &array));
+    bufCreate(&buf, &in);
+
+    parser(&array, buf);
+
+    // for (int i = 0; i < array.capacity; i++)
+    //     printf("%d\n", array.data[i]);
 
     fwrite(array.data, sizeof(int), array.size, out.file);
     
@@ -30,6 +34,7 @@ int main(int argv, char* argc[]) {
     fclose(out.file);
 
     free(array.data);
+    free(buf);
 
     return 0;
 }

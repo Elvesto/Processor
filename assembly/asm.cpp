@@ -5,80 +5,311 @@
 #include <assert.h>
 #include <malloc.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <sys/stat.h>
 
 #include "../array/array.h"
 #include "../instruments/colors.h"
 #include "../processor/processor.h"
 
-int parser(File* in, Array* arr) {
-    assert(in);
+int parser(Array* arr, char* buf) {
     assert(arr);
     assert(arr->data);
-    if (arr->capacity == arr->size) {
-        arrayRealloc(arr);
-    }
-    char command[10] = {};
-    static unsigned int line = 1;
+    assert(buf);
 
-    fscanf(in->file, "%9s ;", command);
+    Array labels = {};
+    arrayInit(&labels, 1);
+    for (int i = 0; i < labels.capacity; i++)
+        labels.data[i] = -1;
 
-    if ((strcmp(command, "PUSH") == 0) || (strcmp(command, "TOLKAI") == 0)) {
-        long long temp = 0;
-        char str[32] = {};
-        char* ptr;
-        Registers reg = {};
+    int line = 0;
+    int label = 0;
 
-        fscanf(in->file, "%31s ;", str);
+    int compile = 0;
 
-        temp = strtol(str, &ptr, 10);
-        if (ptr != str && temp != LONG_MAX && temp != LONG_MIN) {
-            arr->data[(arr->size)++] = PUSH;
-            arr->data[(arr->size)++] = (int)temp;
-        } else if (ptr == str) {
-            if (strcmp(str, "RAX") == 0) {
-                reg = RAX;
-            } else if (strcmp(str, "RBX") == 0) {
-                reg = RBX;
-            } else if (strcmp(str, "RCX") == 0) {
-                reg = RCX;
-            } else if (strcmp(str, "RDX") == 0) {
-                reg = RDX;
-            } else if (strcmp(str, "REX") == 0) {
-                reg = REX;
-            } else if (strcmp(str, "RFX") == 0) {
-                reg = RFX;
-            } else if (strcmp(str, "RGX") == 0) {
-                reg = RGX;
-            }
-            arr->data[(arr->size)++] = PUSHR;
-            arr->data[(arr->size)++] = reg;
+    char* bufSearch = buf;
+    size_t countCom = getCountString(buf);
+    // printf("%d\n", countCom);
+
+    for (int i = 0; i < (int)countCom; i++) {
+        if (!bufSearch[0]) {
+            printf("Konec\n");
+            break;
+        }
+        if (arr->capacity - 2 == arr->size) {
+            arrayRealloc(arr);
+        }
+        // printf("%s\n", bufSearch);
+        // printf("Number Command: %d\n", i);
+        if (bufSearch[0] == ';') {
+            bufSearch += strlen(bufSearch) + 1;
+            i--;
+            continue;
         }
         
-    } else if ((strcmp(command, "ADD") == 0) || (strcmp(command, "DOBAV") == 0)) {
-        arr->data[(arr->size)++] = ADD;
-    } else if ((strcmp(command, "SUB") == 0) || (strcmp(command, "HUAR") == 0)) {
-        arr->data[(arr->size)++] = SUB;
-    } else if ((strcmp(command, "OUT") == 0) || (strcmp(command, "EBI") == 0)) {
-        arr->data[(arr->size)++] = OUT;
-    } else if ((strcmp(command, "HLT") == 0) || (strcmp(command, "POK") == 0)) {
-        arr->data[(arr->size)++] = HLT;
-        return 1;
-    } else if ((strcmp(command, "MUL") == 0) || (strcmp(command, "EBASH") == 0)) {
-        arr->data[(arr->size)++] = MUL;
-    } else if ((strcmp(command, "DIV") == 0) || (strcmp(command, "DELI") == 0)) {
-        arr->data[(arr->size)++] = DIV;
-    } else if ((strcmp(command, "SQRT") == 0) || (strcmp(command, "SQVRT") == 0)) {
-        arr->data[(arr->size)++] = SQRT;
-    // } else if (strchr(command, ';')) {
-    //     *(strchr(command, ';')) = '\0';
-    // } 
-    } else {
-        printf(RED BOLD"Unknown phrase in %s:%u\n" RESET, in->name, line);
-        return 1;
+        Command com = strToCommand(bufSearch);
+        if (sscanf(bufSearch, "%d:", &label) == 1) {
+            // printf("label - %d, address - %d\n", label, i);
+            if (labels.capacity <= label) {
+                arrayNewCapacity(&labels, label + 1);
+            }
+            labels.data[label] = i;
+            arr->data[arr->size++] = LABEL;
+            // arr->data[arr->size++] = label;
+            line++;
+        } else if (com == PUSH) {
+            line++;
+            int temp = 0;
+
+            bufSearch += strlen(bufSearch) + 1;
+            i++;
+
+            Registers reg = {};
+            char* ptr;
+
+            temp = (int)strtol(bufSearch, &ptr, 10);
+            if (ptr != bufSearch) {
+                arr->data[(arr->size)++] = PUSH;
+                arr->data[(arr->size)++] = temp;
+            } else if (ptr == bufSearch) {
+                reg = strToReg(bufSearch);
+                arr->data[(arr->size)++] = PUSHR;
+                arr->data[(arr->size)++] = reg;
+            }
+            // bufSearch += strlen(bufSearch) + 1;
+        } else if (com == POPR) {
+            line++;
+
+            bufSearch += strlen(bufSearch) + 1;
+            i++;
+
+            Registers reg = {};
+
+            reg = strToReg(bufSearch);
+            arr->data[(arr->size)++] = POPR;
+            arr->data[(arr->size)++] = reg;
+            // bufSearch += strlen(bufSearch) + 1;
+        } else if (JMP <= com && com <= CALL) {
+            line++;
+            bufSearch += strlen(bufSearch) + 1;
+            i++;
+
+            
+            sscanf(bufSearch, "%d:", &label);
+            if (labels.capacity <= label) {
+                arrayNewCapacity(&labels, label + 1);
+            }
+            // printf("label - %d, jump address - %d\n", label, labels.data[label]);
+            // printf("%d\n", label);
+            arr->data[(arr->size)++] = com;
+            arr->data[(arr->size)++] = labels.data[label];
+        } else if (com == UNKNOWN) {
+            printf(RED BOLD"Unknown phrase in test.asm:%d\n" RESET, line);
+            arrayDestroy(&labels);
+            return 1;
+        } else {
+            line++; 
+
+            arr->data[(arr->size)++] = com;
+        }
+        bufSearch += strlen(bufSearch) + 1;
     }
 
-    line++;
+    bufSearch = buf;
+    printf("SECOND CoMPILE\n");
+    arr->size = 0;
+
+    for (int i = 0; i < (int)countCom; i++) {
+        if (!bufSearch[0]) {
+            printf("Konec\n");
+            break;
+        }
+        if (arr->capacity - 2 == arr->size) {
+            arrayRealloc(arr);
+        }
+        // printf("%s\n", bufSearch);
+        // printf("Number Command: %d\n", i);
+        if (bufSearch[0] == ';') {
+            bufSearch += strlen(bufSearch) + 1;
+            continue;
+        }
+        
+        Command com = strToCommand(bufSearch);
+        if (sscanf(bufSearch, "%d:", &label) == 1) {
+
+            if (labels.capacity <= label) {
+                arrayNewCapacity(&labels, label + 1);
+            }
+            // printf("label - %d, address - %d\n", label, i);
+            labels.data[label] = i;
+            arr->data[arr->size++] = LABEL;
+            // arr->data[arr->size++] = label;
+            line++;
+        } else if (com == PUSH) {
+            line++;
+            int temp = 0;
+
+            bufSearch += strlen(bufSearch) + 1;
+            i++;
+
+            Registers reg = {};
+            char* ptr;
+
+            temp = (int)strtol(bufSearch, &ptr, 10);
+            if (ptr != bufSearch) {
+                arr->data[(arr->size)++] = PUSH;
+                arr->data[(arr->size)++] = temp;
+            } else if (ptr == bufSearch) {
+                reg = strToReg(bufSearch);
+                arr->data[(arr->size)++] = PUSHR;
+                arr->data[(arr->size)++] = reg;
+            }
+            // bufSearch += strlen(bufSearch) + 1;
+        } else if (com == POPR) {
+            line++;
+
+            bufSearch += strlen(bufSearch) + 1;
+            i++;
+
+            Registers reg = {};
+
+            reg = strToReg(bufSearch);
+            arr->data[(arr->size)++] = POPR;
+            arr->data[(arr->size)++] = reg;
+            // bufSearch += strlen(bufSearch) + 1;
+        } else if (JMP <= com && com <= CALL) {
+            line++;
+            bufSearch += strlen(bufSearch) + 1;
+            i++;
+
+            
+            sscanf(bufSearch, "%d:", &label);
+            if (labels.capacity <= label) {
+                arrayNewCapacity(&labels, label + 1);
+            }
+            // printf("label - %d, jump address - %d\n", label, labels.data[label]);
+            // printf("%d\n", label);
+            arr->data[(arr->size)++] = com;
+            arr->data[(arr->size)++] = labels.data[label];
+        } else if (com == UNKNOWN) {
+            printf(RED BOLD"Unknown phrase in test.asm:%d\n" RESET, line);
+            arrayDestroy(&labels);
+            return 1;
+        } else {
+            line++; 
+
+            arr->data[(arr->size)++] = com;
+        }
+        bufSearch += strlen(bufSearch) + 1;
+    }
+
+    arrayDestroy(&labels);
+    return 0;
+}
+
+Registers strToReg(const char* str) {
+    Registers reg = {};
+    if (strcmp(str, "RAX") == 0) {
+        reg = RAX;
+    } else if (strcmp(str, "RBX") == 0) {
+        reg = RBX;
+    } else if (strcmp(str, "RCX") == 0) {
+        reg = RCX;
+    } else if (strcmp(str, "RDX") == 0) {
+        reg = RDX;
+    } else if (strcmp(str, "REX") == 0) {
+        reg = REX;
+    } else if (strcmp(str, "RFX") == 0) {
+        reg = RFX;
+    } else if (strcmp(str, "RGX") == 0) {
+        reg = RGX;
+    }
+
+    return reg;
+}
+
+Command strToCommand(const char* command) {
+    if ((strcmp(command, "PUSH") == 0) || (strcmp(command, "TOLKAI") == 0))
+        return PUSH;
+    else if ((strcmp(command, "ADD") == 0) || (strcmp(command, "DOBAV") == 0))
+        return ADD;
+    else if ((strcmp(command, "SUB") == 0) || (strcmp(command, "HUAR") == 0))
+        return SUB;
+    else if ((strcmp(command, "OUT") == 0) || (strcmp(command, "EBI") == 0))
+        return OUT;
+    else if ((strcmp(command, "HLT") == 0) || (strcmp(command, "POK") == 0))
+        return HLT;
+    else if ((strcmp(command, "MUL") == 0) || (strcmp(command, "EBASH") == 0))
+        return MUL;
+    else if ((strcmp(command, "DIV") == 0) || (strcmp(command, "DELI") == 0))
+        return DIV;
+    else if ((strcmp(command, "SQRT") == 0) || (strcmp(command, "SQVIRT") == 0))
+        return SQRT;
+    else if ((strcmp(command, "POPR") == 0) || (strcmp(command, "POP") == 0))
+        return POPR;
+    else if ((strcmp(command, "JMP") == 0))
+        return JMP;
+    else if ((strcmp(command, "JB") == 0))
+        return JB;
+    else if ((strcmp(command, "JBE") == 0))
+        return JBE;
+    else if ((strcmp(command, "JA") == 0))
+        return JA;
+    else if ((strcmp(command, "JAE") == 0))
+        return JAE;
+    else if ((strcmp(command, "JE") == 0))
+        return JE;
+    else if ((strcmp(command, "JNE") == 0))
+        return JNE;
+    else if ((strcmp(command, "IN") == 0))
+        return IN;
+    else if ((strcmp(command, "CALL") == 0))
+        return CALL;
+    else if ((strcmp(command, "RET") == 0))
+        return RET;
+    else {
+        return UNKNOWN;
+    }
+}
+
+int bufCreate(char** text, File* file) {
+    struct stat info;
+
+    if (fstat(fileno(file->file), &info) != 0) {
+        return -1;
+    }
+
+    *text = (char*)calloc((size_t)(info.st_size + 1), sizeof(char));
+
+    fread(*text, sizeof(char), (size_t)info.st_size, file->file);
+
+    (*text)[info.st_size] = '\0';
+    // printf("%s\n", *text);
+
+    return 0;
+}
+
+size_t getCountString(char* buf) {
+    assert(buf != NULL);
+    size_t res = 0;
+    char* ptr = buf;
+    for (; (ptr = strchr(ptr, '\n')) != NULL; ) {
+        *ptr = ' ';
+        ptr++;
+    }
+    ptr = buf;
+    for (res = 0; (ptr = strchr(ptr, ' ')) != NULL; res++) {
+        *ptr = '\0';
+        ptr++;
+    }
+    return res;
+}
+
+int nonEmptyCells(Array* arr, int defaultValue) {
+    assert(arr);
+    int res = 0;
+    for (int i = 0; i < arr->capacity; i++) {
+        res = arr->data[i] != defaultValue ? res + 1 : res;
+    }
 
     return 0;
 }

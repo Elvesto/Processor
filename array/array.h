@@ -1,17 +1,21 @@
 #ifndef ARRAY_H_
 #define ARRAY_H_
 
+#include <stdint.h>
+
 typedef struct {
     int* data;
-    unsigned int size;
-    unsigned int capacity;
+    uint64_t size;
+    uint64_t capacity;
 } Array;
 
 //TODO 
-int arrayCtor(Array* arr);
+int arrayInit(Array* arr, uint64_t capacity);
 
 int arrayRealloc(Array* arr);
 
-int arrayDtor(Array* arr);
+int arrayDestroy(Array* arr);
+
+int arrayNewCapacity(Array* arr, int newSize);
 
 #endif // ARRAY_H_

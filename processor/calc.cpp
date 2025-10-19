@@ -8,122 +8,49 @@
 #include "../stack/stack_t.h"
 #include "../array/array.h"
 
-StackError executor(Processor* proc) {
+ProcessorErrors executor(Processor* proc) {
     if (proc == NULL)
-        return PTR_ERROR;
+        return NULL_POINTER;
 
     Stack* stack = &(proc->stack);
     Array* instructions = &(proc->instructions);
+    // static Array labels = {};
+    // arrayInit(&labels, 32);
 
     StackError err = OK;
+    // printf("capcity instruct - %d", instructions->capacity);
 
-    for (proc->ip = 0; proc->ip < instructions->capacity; proc->ip++) {
+    for (proc->ip = 0; proc->ip < (int64_t)instructions->capacity; proc->ip++) {
+        // printf("command - %d\n", instructions->data[proc->ip]);
         switch (instructions->data[proc->ip]) {
             case PUSH:
             {
                 TypeElement temp = (instructions->data)[++(proc->ip)];
                 err = stackPush(stack, temp);
                 if (err) {
-                    return err;
+                    return STACK_ERROR;
                 }
 
                 break;
             }
             case ADD: 
             {
-                int temp1 = 0, temp2 = 0;
-                
-                temp1 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                temp2 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                if (temp1 != POIZON && temp2 != POIZON) {
-                    err = stackPush(stack, temp1 + temp2);
-                    if (err) {
-                        return err;
-                    }
-                } else
-                    printf("Not enough arguments on the stack\n");
-
+                OPERATION(+);
                 break;
             }
             case SUB:
             {
-                int temp1 = 0, temp2 = 0;
-
-                temp2 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                temp1 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                if (temp1 != POIZON && temp2 != POIZON) {
-                    err = stackPush(stack, temp1 - temp2);
-                    if (err) {
-                        return err;
-                    }
-                } else
-                    printf("Not enough arguments on the stack\n");
-
+                OPERATION(-);
                 break;
             }
             case MUL:
             {
-                int temp1 = 0, temp2 = 0;
-                temp1 = stackPop(stack, &err);
-                // printf("%d\n", temp1);
-                if (err) {
-                    return err;
-                }
-
-                temp2 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                if (temp1 != POIZON && temp2 != POIZON) {
-                    err = stackPush(stack, temp1 * temp2);
-                    if (err) {
-                        return err;
-                    }
-                    
-                } else
-                    printf("Not enough arguments on the stack\n");
-
+                OPERATION(*);
                 break;
             }
             case DIV:
             {
-                double temp1 = 0, temp2 = 0;
-
-                temp2 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                temp1 = stackPop(stack, &err);
-                if (err) {
-                    return err;
-                }
-
-                if (!equal(temp1, (double)POIZON) && !equal(temp2,(double)POIZON)) {
-                    err = stackPush(stack, (TypeElement)(temp1 / temp2));
-                    if (err) {
-                        return err;
-                    }
-                } else
-                    printf("Not enough arguments on the stack\n");
-
+                OPERATION(/);
                 break;
             }
             case SQRT:
@@ -132,18 +59,15 @@ StackError executor(Processor* proc) {
 
                 temp = stackPop(stack, &err);
                 if (err) {
-                    return err;
+                    return STACK_ERROR;
                 }
 
-                if (!equal(temp, (double)POIZON)) {
-                    temp = sqrt(temp);
-                    
-                    err = stackPush(stack, (TypeElement)(temp));
-                    if (err) {
-                        return err;
-                    }
-                } else
-                    printf("Not enough arguments on the stack\n");
+                temp = sqrt(temp);
+                
+                err = stackPush(stack, (TypeElement)(temp));
+                if (err) {
+                    return STACK_ERROR;
+                }
 
                 break;
             }
@@ -151,28 +75,106 @@ StackError executor(Processor* proc) {
             {
                 TypeElement temp = stackPop(stack, &err);
                 if (err) {
-                    return err;
+                    return STACK_ERROR;
                 }
 
-                // if (temp != POIZON) {
                 printf("%lf\n", (double)temp);
-                // } else {
-                //     printf("No element\n");
-                // }
 
                 break;
             }
             case HLT:
             {
-                return OK;
+                return NO_PROBLEMS;
+            }
+            case PUSHR:
+            {
+                TypeElement temp = proc->regs[instructions->data[++proc->ip]];
+                err = stackPush(stack, temp);
+                if (err) {
+                    return STACK_ERROR;
+                }
+                break;
+            }
+            case POPR:
+            {
+                TypeElement temp = stackPop(stack, &err);
+                if (err) {
+                    return STACK_ERROR;
+                }
+                proc->regs[instructions->data[++proc->ip]] = temp;
+                break;
+            }
+            case JMP:
+            {
+                int temp = instructions->data[++(proc->ip)];
+                proc->ip = temp + 1;
+                break;
+            }
+            case JB:
+            {
+                JUMP_IF(<);
+                break;
+            }
+            case JBE:
+            {
+                JUMP_IF(<=);
+                break;
+            }
+            case JA:
+            {
+                JUMP_IF(>);
+                break;
+            }
+            case JAE:
+            {
+                JUMP_IF(>=);
+                break;
+            }
+            case JE:
+            {
+                JUMP_IF(==);
+                break;
+            }
+            case JNE:
+            {
+                JUMP_IF(!=);
+                break;
+            }
+            case CALL:
+            {
+                stackPush(&(proc->returnAddress), (int)proc->ip + 1);
+                int temp = instructions->data[++(proc->ip)];
+                proc->ip = temp;
+                break;
+            }
+            case RET:
+            {
+                proc->ip = stackPop(&(proc->returnAddress), &err);
+                break;
+            }
+            case IN:
+            {
+                int temp = 0;
+                scanf("%d", &temp);
+                err = stackPush(stack, temp);
+                if (err) {
+                    printf("ERROR\n");
+                    return STACK_ERROR;
+                }
+                break;
+            }
+            case LABEL:
+            {
+                proc->ip++;
+                break;
             }
             default:
             {
                 printf("razrab daun tak kak - %d\n", instructions->data[proc->ip]);
-                return OK;
-                break;
+                return STRANGE;
+                printf("pizdec\n");
             }
         }
     }
-    return OK;
+    return (ProcessorErrors)err;
 }

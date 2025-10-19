@@ -38,7 +38,7 @@ StackError stackDestroy(Stack* stack);
 
 StackError stackVerify(Stack* stack);
 
-void stackDump(Stack* stack, const char* file, const char* func, size_t line, StackError error);
+void stackDump(Stack* stack, const char* file, const char* func, size_t line, StackError error = OK);
 
 const char* errorToString(StackError error);
 
