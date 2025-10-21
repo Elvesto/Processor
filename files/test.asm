@@ -8,7 +8,7 @@ CALL 1:
 PUSH 0
 JAE 2:
 HLT
-1: ;Discriminant
+1:
 PUSH RBX
 PUSH RBX
 MUL
@@ -44,4 +44,4 @@ PUSH RAX
 MUL
 DIV
 OUT
-IN
+HLT

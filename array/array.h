@@ -12,10 +12,12 @@ typedef struct {
 //TODO 
 int arrayInit(Array* arr, uint64_t capacity);
 
-int arrayRealloc(Array* arr);
+Array* arrayNewCap(Array* arr, uint64_t newSize);
+
+Array* arrayRealloc(Array* arr);
 
 int arrayDestroy(Array* arr);
 
-int arrayNewCapacity(Array* arr, int newSize);
+int fillArray(Array* arr, int value);
 
 #endif // ARRAY_H_

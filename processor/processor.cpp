@@ -5,8 +5,9 @@
 #include "../stack/stack_t.h"
 #include "../array/array.h"
 #include "../logs/log.h"
+#include "../instruments/tools.h"
 
-ProcessorErrors procInit(Processor* proc) {
+ProcessorErrors procInit(Processor* proc, FILE* byteCode) {
     if (!proc) {
         return INIT_ERROR;
     }
@@ -14,15 +15,16 @@ ProcessorErrors procInit(Processor* proc) {
     stackInit(&(proc->stack), 14);
     stackInit(&(proc->returnAddress), 14);
 
-    arrayInit(&(proc->instructions), 128);
+    arrayInit(&(proc->instructions), sizeFile(byteCode));
 
     proc->ip = 0;
+    proc->instructions.size = proc->instructions.capacity - 1;
 
-    for (int i = 0; i < proc->instructions.capacity; i++) {
+    for (uint64_t i = 0; i < proc->instructions.capacity; i++) {
         proc->instructions.data[i] = 0;
     }
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < COUNT_REGISTERS; i++) {
         proc->regs[i] = 0;
     }
 

@@ -16,34 +16,29 @@ int arrayInit(Array* arr, uint64_t capacity) {
     return 0;
 }
 
-int arrayRealloc(Array* arr) {
+Array* arrayRealloc(Array* arr) {
     assert(arr);
-    
-    int* temp = (int*)realloc(arr->data, arr->capacity * 2 * sizeof(int));
-    if (!temp) {
-        free(arr->data);
-        printf("PIZDEC\n");
-        return 1;
-    }
-    arr->data = temp;
-    assert(arr->data);
 
-    return 0;
+    return arrayNewCap(arr, arr->capacity * 2);
 }
 
-int arrayNewCapacity(Array* arr, int newSize) {
+Array* arrayNewCap(Array* arr, uint64_t newCap) {
     assert(arr);
-    arr->capacity = newSize;
+    assert(newCap > arr->capacity);
+    
+    arr->capacity = newCap;
+
     int* temp = (int*)realloc(arr->data, arr->capacity * sizeof(int));
     if (!temp) {
-        free(arr->data);
-        printf("PIZDEC\n");
-        return 1;
+        arrayDestroy(arr);
+        fprintf(stderr, "PIZDEC\n");
+        return NULL;
     }
     arr->data = temp;
+
     assert(arr->data);
 
-    return 0;
+    return arr;
 }
 
 int arrayDestroy(Array* arr) {
@@ -52,6 +47,16 @@ int arrayDestroy(Array* arr) {
     free(arr->data);
     arr->capacity = 0;
     arr->size = 0;
+
+    return 0;
+}
+
+int fillArray(Array* arr, int value) {
+    assert(arr);
+    assert(arr->data);
+
+    for (uint64_t i = arr->size; i < arr->capacity; i++)
+        arr->data[i] = value;
 
     return 0;
 }

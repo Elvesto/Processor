@@ -8,7 +8,33 @@
 
 const int COUNT_REGISTERS = 8;
 
-enum Registers {
+typedef enum {
+    HLT =  0,
+    PUSH =  1,
+    ADD  =  2,
+    SUB  =  3,
+    MUL  =  4,
+    DIV  =  5,
+    SQRT =  6,
+    OUT  =  7,
+    PUSHR = 8,
+    POPR = 9,
+    IN = 10,
+    JMP = 11,
+    JB = 12,
+    JBE = 13,
+    JA = 14,
+    JAE = 15,
+    JE = 16,
+    JNE = 17,
+    CALL = 18, 
+    RET = 19,
+    LABEL = 20,
+    UNKNOWN = -1,
+    
+} Command;
+
+typedef enum Registers {
     RESERVED = 0,
     RAX = 1,
     RBX = 2,
@@ -17,13 +43,13 @@ enum Registers {
     REX = 5,
     RFX = 6,
     RGX = 7
-};
+} Registers;
 
 typedef struct {
     Stack stack;
     Array instructions;
     int64_t ip;
-    int regs[8];
+    int regs[COUNT_REGISTERS];
     Stack returnAddress;
 } Processor;
 
@@ -36,11 +62,12 @@ enum ProcessorErrors {
     STRANGE = 5,
     NULL_POINTER = 6,
     POINTER_ERROR = 7,
+    EXIT = 8,
     
     //  . .
 };
 
-ProcessorErrors procInit(Processor* proc);
+ProcessorErrors procInit(Processor* proc, FILE* byteCode);
 
 ProcessorErrors procDestroy(Processor* proc);
 
