@@ -20,7 +20,7 @@ ProcessorErrors executor(Processor* proc) {
     // printf("capcity instruct - %d", instructions->capacity);
 
     for (proc->ip = 0; proc->ip < (int64_t)proc->instructions.size; proc->ip++) {
-        if (proc->instructions.data[proc->ip] <= RET)
+        if (proc->instructions.data[proc->ip] <= COUNT_EXECUTE_INSTRUCTIONS - 1)
         {
             if (execute[proc->instructions.data[proc->ip]].func(proc) == EXIT) break;
         } else {
@@ -38,10 +38,41 @@ ProcessorErrors hltFunc(Processor* proc) {
 
 ProcessorErrors pushFunc(Processor* proc) {
     StackError err = {};
-    TypeElement temp = (proc->instructions.data)[++(proc->ip)];
-    err = stackPush(&proc->stack, temp);
-    if (err) {
-        return STACK_ERROR;
+    switch (proc->instructions.data[proc->ip]) {
+        case PUSH:
+        {
+            TypeElement temp = (proc->instructions.data)[++(proc->ip)];
+            err = stackPush(&proc->stack, temp);
+            if (err) {
+                return STACK_ERROR;
+            }
+
+            break;
+        }
+        case PUSHR:
+        {
+            TypeElement temp = proc->regs[proc->instructions.data[++proc->ip]];
+            err = stackPush(&proc->stack, temp);
+            if (err) {
+                return STACK_ERROR;
+            }
+
+            break;
+        }
+        case PUSHM:
+        {   
+            TypeElement temp = (proc->ram.data)[proc->regs[proc->instructions.data[++(proc->ip)]]];
+            err = stackPush(&proc->stack, temp);
+            if (err) {
+                return STACK_ERROR;
+            }
+
+            break;
+        }
+        default:
+        {
+            fprintf(stderr, "ERROR - %d\n", proc->instructions.data[proc->ip]);
+        }
     }
 
     return NO_PROBLEMS;
@@ -114,26 +145,35 @@ ProcessorErrors outFunc(Processor* proc) {
     return NO_PROBLEMS;
 }
 
-ProcessorErrors pushRFunc(Processor* proc) {
-    StackError err = {};
-    TypeElement temp = proc->regs[proc->instructions.data[++proc->ip]];
-    Stack* stack = &proc->stack;
-    err = stackPush(stack, temp);
-    if (err) {
-        return STACK_ERROR;
-    }
-
-    return NO_PROBLEMS;
-}
-
-ProcessorErrors popRFunc(Processor* proc) {
+ProcessorErrors popFunc(Processor* proc) {
     StackError err = {};
     Stack* stack = &proc->stack;
-    TypeElement temp = stackPop(stack, &err);
-    if (err) {
-        return STACK_ERROR;
+    switch (proc->instructions.data[proc->ip]) {
+        case POPR:
+        {
+            TypeElement temp = stackPop(stack, &err);
+            if (err) {
+                return STACK_ERROR;
+            }
+            proc->regs[proc->instructions.data[++proc->ip]] = temp;
+
+            break;
+        }
+        case POPM:
+        {
+            TypeElement temp = stackPop(stack, &err);
+            if (err) {
+                return STACK_ERROR;
+            }
+            proc->ram.data[proc->regs[proc->instructions.data[++proc->ip]]] = temp;
+
+            break;
+        }
+        default:
+        {
+            fprintf(stderr, "ERROR - %d\n", proc->instructions.data[proc->ip]);
+        }
     }
-    proc->regs[proc->instructions.data[++proc->ip]] = temp;
 
     return NO_PROBLEMS;
 }

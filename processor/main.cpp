@@ -27,7 +27,7 @@ int main() {
         return err;
     }
 
-    if (fread(processor.instructions.data, sizeof(int), processor.instructions.capacity - 1, byteCode) != processor.instructions.capacity - 1) {
+    if (fread(processor.instructions.data, sizeof(int), processor.instructions.capacity, byteCode) != processor.instructions.capacity) {
         if (!feof(byteCode)) {
             printf("File no open\n");
             return FILE_ERROR;
@@ -35,7 +35,7 @@ int main() {
     }
     
 
-    // for (int i = 0; i < processor.instructions.capacity; i++)
+    // for (uint64_t i = 0; i < processor.instructions.capacity; i++)
     //     printf("%d\n", processor.instructions.data[i]);
 
 

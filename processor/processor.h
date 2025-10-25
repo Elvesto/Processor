@@ -7,6 +7,7 @@
 #define PROC_DUMP(proc) procDump(proc, __FILE__, __FUNCTION__, __LINE__);
 
 const int COUNT_REGISTERS = 8;
+const int RAM_SIZE = 100;
 
 typedef enum {
     HLT =  0,
@@ -30,6 +31,9 @@ typedef enum {
     CALL = 18, 
     RET = 19,
     LABEL = 20,
+    PUSHM = 21,
+    POPM = 22,
+    DRAW = 23,
     UNKNOWN = -1,
     
 } Command;
@@ -51,6 +55,7 @@ typedef struct {
     int64_t ip;
     int regs[COUNT_REGISTERS];
     Stack returnAddress;
+    Array ram;
 } Processor;
 
 enum ProcessorErrors {
@@ -74,5 +79,7 @@ ProcessorErrors procDestroy(Processor* proc);
 ProcessorErrors procVerify(Processor* proc);
 
 int procDump(Processor* proc, const char* f, const char* func, int line);
+
+ProcessorErrors draw(Processor* proc);
 
 #endif // PROCESSOR_H_

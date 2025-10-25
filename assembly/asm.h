@@ -12,6 +12,11 @@ typedef struct {
 } ComInf;
 
 typedef struct {
+    uint64_t index;
+    int label;
+} LabelInfo;
+
+typedef struct {
     const char* nameReg;
     Registers reg;
 } RegInf;
@@ -23,7 +28,7 @@ static ComInf comInfo[] = {
     {.nameCommand = "MUL",      .com = MUL},
     {.nameCommand = "DIV",      .com = DIV},
     {.nameCommand = "SQRT",     .com = SQRT},
-    {.nameCommand = "POPR",     .com = POPR},
+    {.nameCommand = "POP",      .com = POPR},
     {.nameCommand = "JMP",      .com = JMP},
     {.nameCommand = "JB",       .com = JB},
     {.nameCommand = "JBE",      .com = JBE},
@@ -36,6 +41,7 @@ static ComInf comInfo[] = {
     {.nameCommand = "RET",      .com = RET},
     {.nameCommand = "HLT",      .com = HLT},
     {.nameCommand = "OUT",      .com = OUT},
+    {.nameCommand = "DRAW",     .com = DRAW},
 };
 
 const int COUNT_COMMAND = sizeof(comInfo) / sizeof(comInfo[0]);
@@ -59,12 +65,14 @@ Registers strToReg(const char* str);
 
 Command strToCommand(const char* str);
 
-int pushFunc(Array* arr, char* buffer);
+int pushFunction(Array* arr, char* buffer);
 
-int popFunc(Array* arr, char* buffer);
+int popFunction(Array* arr, char* buffer);
 
-int jmpFunc(Array* arr, Array* labels, char* buffer);
+int jmpFunction(Array* arr, Array* labels, char* buffer, Array* labelsCompile);
 
-int comFunc(Array* arr, char* buffer);
+// int comFunction(Array* arr, char* buffer);
+
+// int compileAsm(uint64_t countCom, char* bufIter, Array* labels, Array* arr, );
 
 #endif // ASM_H_

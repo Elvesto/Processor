@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <ctype.h>
 
 int equal(double num1, double num2) {
     return fabs(num1 - num2) < EPS;
@@ -19,7 +20,7 @@ uint64_t sizeFile(FILE* file) {
         return 0;
     }
 
-    return (uint64_t)info.st_size;
+    return (uint64_t)info.st_size + 1;
 }
 
 char* bufCreate(FileParam* file) {
@@ -37,19 +38,26 @@ char* bufCreate(FileParam* file) {
     return buffer;
 }
 
-size_t getCountString(char* buf) {
+size_t getCountString(char *buf) {
     assert(buf != NULL);
-    
-    size_t res = 0;
-    char* ptr = buf;
-    for (; (ptr = strchr(ptr, '\n')) != NULL; ) {
-        *ptr = ' ';
-        ptr++;
+
+    size_t count = 0;
+    int inWord = 0;
+
+    for (char* ptr = buf; *ptr; ptr++) {
+        if (*ptr == '\n') {
+            *ptr = '\0';
+            inWord = 0;
+            continue;
+        }
+
+        if (isspace(*ptr)) {
+            inWord = 0;
+        } else if (!inWord) {
+            inWord = 1;
+            count++;
+        }
     }
-    ptr = buf;
-    for (res = 0; (ptr = strchr(ptr, ' ')) != NULL; res++) {
-        *ptr = '\0';
-        ptr++;
-    }
-    return res;
+
+    return count;
 }

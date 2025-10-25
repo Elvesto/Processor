@@ -36,9 +36,7 @@ ProcessorErrors sqrtFunc(Processor* proc);
 
 ProcessorErrors outFunc(Processor* proc);
 
-ProcessorErrors pushRFunc(Processor* proc);
-
-ProcessorErrors popRFunc(Processor* proc);
+ProcessorErrors popFunc(Processor* proc);
 
 ProcessorErrors inFunc(Processor* proc);
 
@@ -55,8 +53,8 @@ static ExecuteCommand execute[] = {
     {.com = DIV, .func = opFunc},
     {.com = SQRT, .func = sqrtFunc},
     {.com = OUT, .func = outFunc},
-    {.com = PUSHR, .func = pushRFunc},
-    {.com = POPR, .func = popRFunc},
+    {.com = PUSHR, .func = pushFunc},
+    {.com = POPR, .func = popFunc},
     {.com = IN, .func = inFunc},
     {.com = JMP, .func = jmpFunc},
     {.com = JB, .func = jmpFunc},
@@ -68,6 +66,11 @@ static ExecuteCommand execute[] = {
     {.com = CALL, .func = jmpFunc},
     {.com = RET, .func = jmpFunc},
     {.com = LABEL, .func = nothing},
+    {.com = PUSHM, .func = pushFunc},
+    {.com = POPM, .func = popFunc},
+    {.com = DRAW, .func = draw},
 };
+
+const int COUNT_EXECUTE_INSTRUCTIONS = sizeof(execute)/sizeof(execute[0]);
 
 #endif // CALC_H_

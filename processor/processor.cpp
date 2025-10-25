@@ -16,12 +16,17 @@ ProcessorErrors procInit(Processor* proc, FILE* byteCode) {
     stackInit(&(proc->returnAddress), 14);
 
     arrayInit(&(proc->instructions), sizeFile(byteCode));
+    arrayInit(&(proc->ram), RAM_SIZE);
 
     proc->ip = 0;
     proc->instructions.size = proc->instructions.capacity - 1;
 
     for (uint64_t i = 0; i < proc->instructions.capacity; i++) {
         proc->instructions.data[i] = 0;
+    }
+
+    for (uint64_t i = 0; i < proc->ram.capacity; i++) {
+        proc->ram.data[i] = 35;
     }
 
     for (int i = 0; i < COUNT_REGISTERS; i++) {
@@ -46,6 +51,7 @@ ProcessorErrors procDestroy(Processor* proc) {
     }
 
     arrayDestroy(&(proc->instructions));
+    arrayDestroy(&(proc->ram));
 
     proc->ip = 0;
 
@@ -98,4 +104,15 @@ int procDump(Processor* proc, const char* f, const char* func, int line) {
     logWrite(DEBUG, "---------------------END--------------------------");
 
     return 0;
+}
+
+ProcessorErrors draw(Processor* proc) {
+    for (uint64_t i = 0; i < proc->ram.capacity / 10; i++) {
+        for (uint64_t j = 0; j < 10; j++) {
+            printf("%c", proc->ram.data[i*10 + j]);
+        }
+        printf("\n");
+    }
+
+    return NO_PROBLEMS;
 }

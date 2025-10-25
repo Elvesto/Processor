@@ -20,96 +20,91 @@ int parser(Array* arr, char* buf) {
     arrayInit(&labels, 8);
     fillArray(&labels, LABELS_POISON);
 
+    Array labelsCompile = {};
+    arrayInit(&labelsCompile, labels.capacity * 2);
+
     int line = 1;
     int label = 0;
-    int jumps;
+    int jumps = 0;
+    // int compile = 1;
 
-    int compile = 1;
-
-    char* bufSearch = buf;
+    char* bufIter = buf;
     uint64_t countCom = getCountString(buf);
-    // printf("%d\n", countCom);
 
     for (uint64_t i = 0; i < countCom; i++) {
-        //printf("%s\n", bufSearch);
-        if (!bufSearch[0]) {
-            fprintf(stderr, "Konec\n");
+        if (!*bufIter) {
             break;
         }
+
+        size_t lenStr = strlen(bufIter);
+        char* firstParam = strtok(bufIter, " ;");
+        char* secondParam = strtok(NULL, " ;");
+        // printf("%s %s\n", firstParam, secondParam);
+
+        if (!firstParam[0]) {
+            fprintf(stderr, "Empty line at %d\n", line);
+        }
+
         if (arr->capacity - 2 == arr->size) {
             arrayRealloc(arr);
         }
-        // printf("%s\n", bufSearch);
-        // printf("Number Command: %d\n", i);
-        if (bufSearch[0] == ';') {
-            bufSearch += strlen(bufSearch) + 1;
-            // i--;
-            continue;
-        }
-        
-        if (sscanf(bufSearch, "%d:", &label)) {
-            //printf("label - %d, address - %lu\n", label, i);
+
+        if (sscanf(firstParam, "%d:", &label) == 1) {
             if (labels.capacity <= (uint64_t)label) {
                 arrayNewCap(&labels, (uint64_t)label + 1);
                 fillArray(&labels, LABELS_POISON);
             }
-            labels.data[label] = (int)i - jumps;;
-            //arr->data[arr->size++] = LABEL;
-
-            bufSearch += strlen(bufSearch) + 1;
+            labels.data[label] = (int)i - jumps;
+            bufIter += lenStr + 1;
             line++;
             continue;
-        } 
-        
-        Command com = strToCommand(bufSearch);
+        }
+
+        Command com = strToCommand(firstParam);
+
         if (com == PUSH) {
+            if (secondParam == NULL) {
+                fprintf(stderr, RED BOLD "Missing argument for PUSH at line %ld\n" RESET, i);
+                arrayDestroy(&labels);
+                return 1;
+            }
 
-            bufSearch += strlen(bufSearch) + 1;
+            pushFunction(arr, secondParam);
             i++;
-
-            pushFunc(arr, bufSearch);
-            line++;
         } else if (com == POPR) {
+            if (secondParam == NULL) {
+                fprintf(stderr, RED BOLD "Missing argument for POP at line %d %s %s\n" RESET, i, firstParam, secondParam);
+                arrayDestroy(&labels);
+                return 1;
+            }
 
-            bufSearch += strlen(bufSearch) + 1;
+            popFunction(arr, secondParam);
             i++;
-
-            popFunc(arr, bufSearch);
-            line++;
         } else if (JMP <= com && com <= CALL) {
             jumps++;
-
-            arr->data[(arr->size)++] = com;
-            bufSearch += strlen(bufSearch) + 1;
+            arr->data[arr->size++] = com;
+            jmpFunction(arr, &labels, secondParam, &labelsCompile);
             i++;
-
-            jmpFunc(arr, &labels, bufSearch);
-            line++;
         } else if (com == UNKNOWN) {
-
-            printf("%s - %d\n", bufSearch, com);
-            fprintf(stderr, RED BOLD"Unknown phrase in %d\n" RESET, line);
+            fprintf(stderr, RED BOLD "Unknown phrase at line %d: %s %s\n" RESET,
+                    line, firstParam, secondParam ? secondParam : "");
             arrayDestroy(&labels);
-
             return 1;
-
         } else {
+            arr->data[arr->size++] = com;
+        }
 
-            arr->data[(arr->size)++] = com;
-            line++;
-        }
-        bufSearch += strlen(bufSearch) + 1;
-        if ((compile == 1) && (i == countCom - 1)) {
-            //printf("SECOND COMPILATION\n");
-            compile++;
-            bufSearch = buf;
-            arr->size = 0;
-            i = 0;
-            continue;
-        }
+        bufIter += lenStr + 1;
+        line++;
+    }
+
+    for (uint64_t i = 0; i < labelsCompile.size; i++) {
+        arr->data[labelsCompile.data[i]] = labels.data[labelsCompile.data[i + 1]];
+        i++;
     }
 
     arrayDestroy(&labels);
+    arrayDestroy(&labelsCompile);
     return 0;
 }
 
@@ -136,48 +131,79 @@ Command strToCommand(const char* command) {
     return UNKNOWN;
 }
 
-int pushFunc(Array* arr, char* bufSearch) {
+int pushFunction(Array* arr, char* bufSearch) {
     assert(arr);
     assert(bufSearch);
 
     int temp = 0;
     Registers reg = {};
     char* ptr = {};
+    if ((ptr = strchr(bufSearch, ' ')) != NULL) {
+        *ptr = '\0';
+    }
 
     temp = (int)strtol(bufSearch, &ptr, 10);
     if (ptr != bufSearch) {
         arr->data[(arr->size)++] = PUSH;
         arr->data[(arr->size)++] = temp;
     } else if (ptr == bufSearch) {
-        reg = strToReg(bufSearch);
+        char regStr[8] = "";
+        if (sscanf(bufSearch, "[%3s]", regStr) == 1) {
+            reg = strToReg(regStr);
+            // if (reg == RESERVED) return 1;
+            arr->data[(arr->size)++] = PUSHM;
+            // arr->data[(arr->size)++] = reg;
+            // return 0;
+        } else {
+            reg = strToReg(bufSearch);
+            arr->data[(arr->size)++] = PUSHR;
+        }
         if (reg == RESERVED) return 1;
-        arr->data[(arr->size)++] = PUSHR;
         arr->data[(arr->size)++] = reg;
     }
 
     return 0;
 }
 
-int popFunc(Array* arr, char* bufSearch) {
+int popFunction(Array* arr, char* bufSearch) {
     assert(arr);
     assert(bufSearch);
 
+    
     Registers reg = {};
-
-    reg = strToReg(bufSearch);
+    char* ptr = {};
+    if ((ptr = strchr(bufSearch, ' ')) != NULL) {
+        *ptr = '\0';
+    }
+    
+    char regStr[8] = "";
+    if (sscanf(bufSearch, "[%3s]", regStr)) {
+        reg = strToReg(regStr);
+        arr->data[(arr->size)++] = POPM;
+        // if (reg == RESERVED) return 1;
+        // arr->data[(arr->size)++] = reg;
+    }
+    else {
+        reg = strToReg(bufSearch);
+        // printf("GOOOOOOOL --- %d\n", reg);
+        arr->data[(arr->size)++] = POPR;
+    }
     if (reg == RESERVED) return 1;
-    arr->data[(arr->size)++] = POPR;
     arr->data[(arr->size)++] = reg;
     
     return 0;
 }
 
-int jmpFunc(Array* arr, Array* labels, char* bufSearch) {
+int jmpFunction(Array* arr, Array* labels, char* bufSearch, Array* labelsCompile) {
     assert(arr);
     assert(labels);
     assert(bufSearch);
 
     uint64_t label = {};
+    char* ptr = {};
+    if ((ptr = strchr(bufSearch, ' ')) != NULL) {
+        *ptr = '\0';
+    }
 
     sscanf(bufSearch, "%lu:", &label);
     //printf("JUMP TO %d ADDRESS - %d\n", label, labels->data[label]);
@@ -187,7 +213,16 @@ int jmpFunc(Array* arr, Array* labels, char* bufSearch) {
     }
     // printf("label - %d, jump address - %d\n", label, labels.data[label]);
     // printf("%d\n", label);
-    arr->data[(arr->size)++] = labels->data[label];
+    if (labels->data[label] != LABELS_POISON) {
+        arr->data[(arr->size)++] = labels->data[label];
+    } else {
+        if (labelsCompile->size + 2 >= labelsCompile->capacity) {
+            arrayRealloc(labelsCompile);
+        }
+        arr->data[(arr->size)++] = labels->data[label];
+        labelsCompile->data[labelsCompile->size++] = (int)arr->size - 1;
+        labelsCompile->data[labelsCompile->size++] = (int)label;
+    }
 
     return 0;
 }

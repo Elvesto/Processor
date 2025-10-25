@@ -31,10 +31,10 @@ int main(int argv, char* argc[]) {
 
     parser(&array, buf);
 
-    for (uint64_t i = 0; i < array.capacity; i++)
+    for (uint64_t i = 0; i < array.size; i++)
         printf("%d\n", array.data[i]);
 
-    fwrite(array.data, sizeof(int), array.size, out.file);
+    fwrite(array.data, sizeof(int), array.capacity, out.file);
     
     fclose(in.file);
     fclose(out.file);
